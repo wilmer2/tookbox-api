@@ -1,11 +1,7 @@
 import express from 'express'
-
+import { FileController } from '../controllers/file-controller.js'
 export const fileRouter = express.Router()
 
-fileRouter.get('/list', (req, res) => {
-  res.json({ message: 'list' })
-})
+fileRouter.get('/list', FileController.getList)
 
-fileRouter.get('/data', (req, res) => {
-  res.json({ message: 'data' })
-})
+fileRouter.get('/data', FileController.getData)
