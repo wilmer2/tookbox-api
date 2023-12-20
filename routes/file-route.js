@@ -1,11 +1,11 @@
-import express from 'express';
+import express from 'express'
 
-export const fileRouter = express.Router();
+export const fileRouter = express.Router()
 
 fileRouter.get('/list', (req, res) => {
-	res.json({ message: 'list' });
-});
+  res.json({ message: 'list' })
+})
 
 fileRouter.get('/data', (req, res) => {
-	res.json({ message: 'data' });
-});
+  res.json({ message: 'data' })
+})
