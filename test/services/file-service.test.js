@@ -2,8 +2,22 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { FileModel } from '../../models/file-model.js';
 import { FileService } from '../../services/file-service.js';
-import { StreamService } from '../../services/stream-service.js';
 
+const csvRows = [
+  {
+    'file': 'test2.csv',
+    'text': 'aDxWNNooHF',
+    'number': '68822651',
+    'hex': 'c1399a3ab152329c2c1a5c4129327763'
+  },
+  {
+    'file': 'test3.csv',
+    'text': 'tuql',
+    'number': '7041998326',
+    'hex': '41f201d219ee9261b930e79d2885b6f8'
+  }
+]
+const fileNames = ['test2.csv', 'test3.csv']
 
 describe('FileService', () => {
   let fileService;
@@ -34,14 +48,35 @@ describe('FileService', () => {
     });
 
     it('should return correct file names', async () => {
-      const fileNames = {files: ['file1.csv', 'file2.csv']};
+      const files = {files: fileNames};
 
-      sinon.stub(FileModel, 'getList').resolves(fileNames)
+      sinon.stub(FileModel, 'getList').resolves(files)
       const result = await fileService.getAllFiles();
 
       expect(result.error).to.equal(null);
-      expect(result.data).to.equal(fileNames)
+      expect(result.data).to.equal(files)
     });
+  })
+
+  describe('#getCsvRows', () => {
+    it('should handle successful file data retrieval', async () => {
+
+      sinon.stub(FileModel, 'getFileData').resolves({})
+      sinon.stub(fileService.streamService, 'processCSVStream').resolves(csvRows)
+
+      const result = await fileService.getCsvRows([fileNames[0]])
+
+      expect(result[0]).to.deep.equal(csvRows);
+    })
+
+    it('should return null values', async () => {
+      sinon.stub(FileModel, 'getFileData').rejects({})
+      sinon.stub(fileService.streamService, 'processCSVStream').resolves(csvRows)
+
+      const result = await fileService.getCsvRows(fileNames)
+
+      expect(result).to.deep.equal([null, null])
+    })
   })
 
   
