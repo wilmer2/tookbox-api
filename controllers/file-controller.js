@@ -16,13 +16,15 @@ export class FileController {
   getData = async (req, res) => {
     const { data, error } = await this.fileService.getAllFiles()
 
-    if (error) return res.state(error.statusCode).json(error)
+    if (error) return res.status(error.statusCode).json(error)
 
+    const { fileName } = req.query
     const { files } = data
+    const selectedFiles = fileName ? files.filter((file) => file === fileName) : files
 
-    const { data: csvList, error: errorStream } = await this.fileService.getFilesData(files)
+    const { data: csvList, error: errorStream } = await this.fileService.getFilesData(selectedFiles)
 
-    if (errorStream) return res.state(errorStream.statusCode).json(errorStream)
+    if (errorStream) return res.status(errorStream.statusCode).json(errorStream)
 
     res.json(csvList)
   }
