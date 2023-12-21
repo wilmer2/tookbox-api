@@ -6,4 +6,10 @@ export class FileModel {
 
     return response?.data
   }
+
+  static async getFileData (fileName) {
+    const response = await httpClient.get(`/file/${fileName}`, { responseType: 'stream' })
+
+    return response?.data
+  }
 }

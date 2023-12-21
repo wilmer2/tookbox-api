@@ -10,14 +10,20 @@ export class FileController {
 
     if (error) return res.status(error.statusCode).json(error)
 
-    res.json(data)
+    res.json(data.files)
   }
 
   getData = async (req, res) => {
-    const { data: fileList, error } = await this.fileService.getAllFiles()
+    const { data, error } = await this.fileService.getAllFiles()
 
     if (error) return res.state(error.statusCode).json(error)
 
-    res.json({ message: JSON.stringify(fileList) })
+    const { files } = data
+
+    const { data: csvList, error: errorStream } = await this.fileService.getFilesData(files)
+
+    if (errorStream) return res.state(errorStream.statusCode).json(errorStream)
+
+    res.json(csvList)
   }
 }
