@@ -5,7 +5,7 @@ import { StreamService } from '../../services/stream-service.js'
 
 
 describe('StreamService', () => {
-  describe('processCSVStream', () => {
+  describe('#processCSVStream', () => {
     it('should process a CSV stream correctly', async () => {
       const csvData = 'header1,header2\nvalue1,value2\nvalue3,value4'
       const readableStream = Readable.from([csvData])
