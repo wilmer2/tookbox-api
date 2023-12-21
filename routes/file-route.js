@@ -2,6 +2,8 @@ import express from 'express'
 import { FileController } from '../controllers/file-controller.js'
 export const fileRouter = express.Router()
 
-fileRouter.get('/list', FileController.getList)
+const fileController = new FileController()
 
-fileRouter.get('/data', FileController.getData)
+fileRouter.get('/list', fileController.getList)
+
+fileRouter.get('/data', fileController.getData)

@@ -1,16 +1,20 @@
-import { FileModel } from '../models/file-model.js'
+import { FileService } from '../services/file-service.js'
 
 export class FileController {
-  static async getList (req, res) {
-    const { data, error } = await FileModel.getList()
+  constructor () {
+    this.fileService = new FileService()
+  }
+
+  getList = async (req, res) => {
+    const { data, error } = await this.fileService.getAllFiles()
 
     if (error) return res.status(error.statusCode).json(error)
 
     res.json(data)
   }
 
-  static async getData (req, res) {
-    const { data: fileList, error } = await FileModel.getList()
+  getData = async (req, res) => {
+    const { data: fileList, error } = await this.fileService.getAllFiles()
 
     if (error) return res.state(error.statusCode).json(error)
 
