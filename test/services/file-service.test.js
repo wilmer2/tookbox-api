@@ -1,26 +1,49 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
-import { FileModel } from '../../models/file-model.js';
-import { FileService } from '../../services/file-service.js';
+import { expect } from 'chai'
+import sinon from 'sinon'
+import { FileModel } from '../../models/file-model.js'
+import { FileService } from '../../services/file-service.js'
 
 const csvRows = [
   {
-    'file': 'test2.csv',
-    'text': 'aDxWNNooHF',
-    'number': '68822651',
-    'hex': 'c1399a3ab152329c2c1a5c4129327763'
+    file: 'test2.csv',
+    text: 'aDxWNNooHF',
+    number: '68822651',
+    hex: 'c1399a3ab152329c2c1a5c4129327763'
   },
   {
-    'file': 'test3.csv',
-    'text': 'tuql',
-    'number': '7041998326',
-    'hex': '41f201d219ee9261b930e79d2885b6f8'
+    file: 'test3.csv',
+    text: 'tuql',
+    number: '7041998326',
+    hex: '41f201d219ee9261b930e79d2885b6f8'
   }
 ]
+
+const badCsvRows = [
+  ...csvRows,
+  {
+    file: 'badnumber.csv',
+    text: 'aDxWNNooHFsdfsdfsf',
+    number: '6882265o',
+    hex: 'c1399a3ab152329c2c1a5c4129327763'
+  },
+  {
+    file: 'badhexa.csv',
+    text: 'tuqsdfsdfsl',
+    number: '7041998326',
+    hex: '41f201d219ee9261b930e79d2885b6f8123213123'
+  },
+  {
+    file: 'emptytext.csv',
+    text: '',
+    number: '7041998326',
+    hex: '41f201d219ee9261b930e79d2885b6f8123213123'
+  }
+]
+
 const fileNames = ['test2.csv', 'test3.csv']
 
 describe('FileService', () => {
-  let fileService;
+  let fileService
 
   beforeEach(() => {
     fileService = new FileService()
@@ -34,39 +57,38 @@ describe('FileService', () => {
     it('should handle errors when getting all files', async () => {
       const errorResponse = {
         response: {
-          status: 404,
+          status: 404
         },
-      };
+      }
   
-      sinon.stub(FileModel, 'getList').rejects(errorResponse);
+      sinon.stub(FileModel, 'getList').rejects(errorResponse)
   
-      const result = await fileService.getAllFiles();
+      const result = await fileService.getAllFiles()
   
-      expect(result.data).to.equal(null);
-      expect(result.error.statusCode).to.equal(404);
-      expect(result.error.message).to.equal('No se pudo procesar la solicitud de archivos');
-    });
+      expect(result.data).to.equal(null)
+      expect(result.error.statusCode).to.equal(404)
+      expect(result.error.message).to.equal('No se pudo procesar la solicitud de archivos')
+    })
 
     it('should return correct file names', async () => {
-      const files = {files: fileNames};
+      const files = { files: fileNames }
 
       sinon.stub(FileModel, 'getList').resolves(files)
-      const result = await fileService.getAllFiles();
+      const result = await fileService.getAllFiles()
 
-      expect(result.error).to.equal(null);
+      expect(result.error).to.equal(null)
       expect(result.data).to.equal(files)
-    });
+    })
   })
 
   describe('#getCsvRows', () => {
     it('should handle successful file data retrieval', async () => {
-
       sinon.stub(FileModel, 'getFileData').resolves({})
       sinon.stub(fileService.streamService, 'processCSVStream').resolves(csvRows)
 
       const result = await fileService.getCsvRows([fileNames[0]])
 
-      expect(result[0]).to.deep.equal(csvRows);
+      expect(result[0]).to.deep.equal(csvRows)
     })
 
     it('should return null values', async () => {
@@ -79,5 +101,25 @@ describe('FileService', () => {
     })
   })
 
-  
+  describe('#getFilesData', () => {
+    it('should only return valid csv', async () => {
+      sinon.stub(FileModel, 'getFileData').resolves({})
+      sinon.stub(fileService.streamService, 'processCSVStream').resolves(badCsvRows)
+      const result = await fileService.getFilesData([fileNames[0]])
+
+      expect(result.error).to.equal(null)
+      expect(result.data).to.deep.equal(csvRows)
+    })
+
+    it('should handle errors when the request fails', async () => {
+      const errorResponse = { response: { status: 500 } }
+
+      sinon.stub(fileService, 'getCsvRows').rejects(errorResponse)
+      const result = await fileService.getFilesData([fileNames[0]])
+
+      expect(result.data).to.equal(null)
+      expect(result.error.statusCode).to.equal(500)
+      expect(result.error.message).to.equal('No se pudo procesar la solicitud de archivos')
+    })
+  })
 })

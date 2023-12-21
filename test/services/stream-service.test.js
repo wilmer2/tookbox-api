@@ -2,8 +2,6 @@ import { Readable } from 'stream'
 import { expect } from 'chai'
 import { StreamService } from '../../services/stream-service.js'
 
-
-
 describe('StreamService', () => {
   describe('#processCSVStream', () => {
     it('should process a CSV stream correctly', async () => {
@@ -27,7 +25,6 @@ describe('StreamService', () => {
         await service.processCSVStream(erroneousStream)
         throw new Error('Promise should have been rejected')
       } catch (error) {
-
         expect(error).to.not.equal(undefined)
       }
     })
